@@ -1,8 +1,7 @@
 package com.almond.jwt_spring.config;
 
+import com.almond.jwt_spring.config.filter.MyFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
@@ -22,6 +22,9 @@ public class SequrityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
+
+        // 이렇게 등록해도 되지만 필터 config에서 등록하는 것이 더 좋다.
+//        http.addFilterBefore(new MyFilter(), BasicAuthenticationFilter.class); // 커스텀 필터 추가
         http.cors(cors -> cors.configurationSource(corsConfigurationSource)); // cors 설정
         http.sessionManagement(h -> h.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션인증 비활성화
         http.formLogin(AbstractHttpConfigurer::disable); // form 로그인 비활성화

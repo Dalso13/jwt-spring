@@ -8,7 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestApiController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public  String index() {
+    public String home() {
+        return "Hello World!";
+    }
+
+    @RequestMapping(value = "/token", method = RequestMethod.POST)
+    public String token() {
         return "Hello World!";
     }
 }
