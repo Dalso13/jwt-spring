@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,11 +25,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SequrityConfig {
 
     private final UrlBasedCorsConfigurationSource corsConfigurationSource;
+    
+    // AuthenticationManager 가 필요해서 Bean으로 등록 후 FilterChain 에서 매개변수로 주입
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        AuthenticationManager manager = http.getSharedObject(AuthenticationManager.class);
+    public SecurityFilterChain filterChain(HttpSecurity http,  AuthenticationManager authenticationManager) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -40,7 +45,7 @@ public class SequrityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable); // basic 로그인 비활성화 (header에 username, password를 넣어서 요청하는 방식)
         // 로그인 시도시 작동하는 필터
         // AuthenticationManager 매개변수를 던져줘야 함
-        http.addFilter(new JwtAuthenticationFilter(manager));
+        http.addFilter(new JwtAuthenticationFilter(authenticationManager));
 
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/api/v1/user/**").hasAnyRole("MANAGER", "ADMIN","USER")

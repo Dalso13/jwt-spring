@@ -6,6 +6,6 @@
         VALUES (#{username},#{password},#{email},#{role})
     </insert>
     <select id="findByUsername" parameterType="String" resultType="com.almond.jwt_spring.dto.User">
-        SELECT username, password, email, role, create_date FROM user WHERE username = #{username}
+        SELECT id,username, password, email, role, create_date FROM user WHERE username = #{username}
     </select>
 </mapper>
