@@ -1,30 +1,27 @@
 package com.almond.jwt_spring.config;
 
-import com.almond.jwt_spring.config.filter.MyFilter;
 import com.almond.jwt_spring.config.jwt.JwtAuthenticationFilter;
+import com.almond.jwt_spring.config.jwt.JwtAuthorizationFilter;
+import com.almond.jwt_spring.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SequrityConfig {
+public class SecurityConfig {
 
     private final UrlBasedCorsConfigurationSource corsConfigurationSource;
+    private final UserMapper mapper;
     
     // AuthenticationManager 가 필요해서 Bean으로 등록 후 FilterChain 에서 매개변수로 주입
     @Bean
@@ -46,6 +43,8 @@ public class SequrityConfig {
         // 로그인 시도시 작동하는 필터
         // AuthenticationManager 매개변수를 던져줘야 함
         http.addFilter(new JwtAuthenticationFilter(authenticationManager));
+        // 권환이 필요한 url 접근시 작동하는 필터
+        http.addFilter(new JwtAuthorizationFilter(authenticationManager, mapper));
 
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/api/v1/user/**").hasAnyRole("MANAGER", "ADMIN","USER")

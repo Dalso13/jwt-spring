@@ -38,4 +38,14 @@ public class RestApiController {
         mapper.join(user);
         return "가입 완료";
     }
+
+    @RequestMapping(value = "/api/v1/user", method = RequestMethod.GET)
+    public String user() {
+        return "user";
+    }
+
+    @RequestMapping(value = "/api/v1/manager", method = RequestMethod.GET)
+    public String manager() {
+        return "manager";
+    }
 }
