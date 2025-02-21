@@ -1,14 +1,12 @@
 package com.almond.jwt_spring.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString

@@ -1,13 +1,19 @@
 package com.almond.jwt_spring.config;
 
 import com.almond.jwt_spring.config.filter.MyFilter;
+import com.almond.jwt_spring.config.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,6 +27,9 @@ public class SequrityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        AuthenticationManager manager = http.getSharedObject(AuthenticationManager.class);
+
         http.csrf(AbstractHttpConfigurer::disable);
 
         // 이렇게 등록해도 되지만 필터 config에서 등록하는 것이 더 좋다.
@@ -29,6 +38,9 @@ public class SequrityConfig {
         http.sessionManagement(h -> h.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션인증 비활성화
         http.formLogin(AbstractHttpConfigurer::disable); // form 로그인 비활성화
         http.httpBasic(AbstractHttpConfigurer::disable); // basic 로그인 비활성화 (header에 username, password를 넣어서 요청하는 방식)
+        // 로그인 시도시 작동하는 필터
+        // AuthenticationManager 매개변수를 던져줘야 함
+        http.addFilter(new JwtAuthenticationFilter(manager));
 
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/api/v1/user/**").hasAnyRole("MANAGER", "ADMIN","USER")
